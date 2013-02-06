@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Dec 12 12:51:26 2012
-
 @author: JiM
 """
 import pandas as pd
