@@ -2,6 +2,7 @@
 Compares eMOLT with FVCOM bottom temp
 @author: jmanning, rsignell, yacheng
 """
+
 import matplotlib.pyplot as plt
 import netCDF4
 from getdata import getemolt_latlon,getemolt_temp
