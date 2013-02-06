@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 23 11:37:52 2013
-
 @author: jmanning and Yacheng
 """
 '''
