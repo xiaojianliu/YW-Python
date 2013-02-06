@@ -7,7 +7,6 @@
 ## October 2011
 ## March 2012
 ## Nov 2012  trouble with ginput causing segfault
-
 ## STEPS ARE AS FOLLOWS:
 #  - load all the ascii data file
 #  - for each drifter it conducts 4 basic steps
