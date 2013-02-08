@@ -23,6 +23,7 @@ import datetime
 import pandas
 from datetime import datetime
 from dateutil import parser
+import numpy as np
 #from getdata import getemolt_data#####very similar with getemolt_temp
 #HARCODES####
 site='BN01' # this is the 4-digit eMOLT site code you must know ahead of time
@@ -78,7 +79,16 @@ because tso1.index contain(1-366) so when we convert days to datetime format,366
 so we delete the last index 366 and copy the last second record.
 '''
 ######################################################################################################
-ax = pandas.DataFrame(tso1.values,index=date).plot()
+values=list(np.resize(tso1.values,(1,tso1.values.shape[0]))[0]) 
+tso1temp=[]
+for i in range(len(values)):
+    if str(values[i])<>'nan':
+        tso1temp.append(values[i])
+fig=plt.figure()
+ax=fig.add_subplot(111)
+ax.plot(date,tso1.values)
+ax.set_ylabel('fahrenheit')
+ax.set_ylim(min(tso1temp),max(tso1temp)+10)
 for i in range(len(ax.lines)):#plot in different ways
     if i<int(len(ax.lines)/2):
         ax.lines[i].set_linestyle('--')
@@ -89,6 +99,9 @@ for i in range(len(ax.lines)):#plot in different ways
     else:
         ax.lines[-1].set_linewidth(5)
         ax.lines[-1].set_color('black')
+ax2=ax.twinx()
+ax2.set_ylabel('celsius')
+ax2.set_ylim((min(tso1temp)-32)/1.8,(max(tso1temp)+10-32)/1.8)
 '''
 below is to format the x-axis
 '''        
