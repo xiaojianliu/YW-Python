@@ -98,7 +98,7 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
           dr=read_csv(direct+fn,sep=',',skiprows=2,parse_dates={'datet':[1]},index_col='datet',names=['NO','DataTime','CondHighRng','RawTemp','Salinity','CouplerDetached','CouplerAttached','Stopped','EndOfFile'])
           dt=DataFrame(dr['RawTemp'],index=dr.index)
       draw=dt[sfinalforplot:efinalforplot] 
-      fig=plt.figure(figsize=(10,5))
+      fig=plt.figure(figsize=(8,5))
       ax = fig.add_subplot(111)
       ax.set_ylim(min(FF.values),max(FF.values))
       if dt.index[-1]-dt.index[0]>timedelta(days=180):
