@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 23 11:37:52 2013
+
 @author: jmanning and Yacheng
 """
 '''
@@ -39,6 +40,7 @@ fn='mbn0111.csv'
 #Sc='xx01'
 Sc=fn[1:3].upper()+fn[3:5]
 dep='20.0'
+crit=3
 #Ps='01'
 Ps=fn[5:7]
 
@@ -77,7 +79,7 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       plt.clf()
      ######for the final figure################
       FF=df[sfinalforplot:efinalforplot]#FF is the DataFrame that include all the records you choosed to plot.
-      criteria=3.0*FF.values.std() # standard deviations
+      criteria=crit*FF.values.std() # standard deviations
 #      criteria=FF.values.std()
       a=0
       for i in range(len(FF)-2):#replace the record value which exceed 3 times standard deviations by 'Nan'.
@@ -97,14 +99,17 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
           dr=read_csv(direct+fn,sep=',',skiprows=2,parse_dates={'datet':[1]},index_col='datet',names=['NO','DataTime','CondHighRng','RawTemp','Salinity','CouplerDetached','CouplerAttached','Stopped','EndOfFile'])
           dt=DataFrame(dr['RawTemp'],index=dr.index)
       draw=dt[sfinalforplot:efinalforplot] 
-      fig=plt.figure(figsize=(10,5))
+      fig=plt.figure(figsize=(8,5))
       ax = fig.add_subplot(111)
       ax.set_ylim(min(FF.values),max(FF.values))
-      if dt.index[-1]-dt.index[0]>timedelta(days=180):
-          intr=4
+      if FF.index[-1]-FF.index[0]>timedelta(days=180):
+          intr=35
+      elif (FF.index[-1]-FF.index[0]>timedelta(days=30)) and (FF.index[-1]-FF.index[0]<=timedelta(days=180)):
+          intr=15     
       else:
           intr=2
-      ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+      #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+      ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
       ax.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
       ax.xaxis.set_major_locator(dates.MonthLocator())
       ax.xaxis.set_major_formatter(dates.DateFormatter(''))
@@ -112,18 +117,24 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       ax.set_ylabel('celsius')
       year=str(int((FF.index.year).mean()))    
       ax.set_xlabel(year)
- #     ax.set_xlabel('2012')
       FT=[]
-      for k in range(len(FF.index)):#convert C to F
-          f=c2f(FF['Temp'][k])
-          FT.append(f)
+#     for k in range(len(FF.index)):#convert C to F
+      f=c2f(FF['Temp'])
+      FT.append(f)
       ax2=ax.twinx()
-      ax2.set_ylim(min(FT),max(FT))
-      ax2.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+      ax2.set_ylim(min(FT[0][0]),max(FT[0][0]))
+      if FF.index[-1]-FF.index[0]>timedelta(days=180):
+          intr=35
+      elif (FF.index[-1]-FF.index[0]>timedelta(days=30)) and (FF.index[-1]-FF.index[0]<=timedelta(days=180)):
+          intr=15     
+      else:
+          intr=2
+      #ax2.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+      ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
       ax2.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
       ax2.xaxis.set_major_locator(dates.MonthLocator())
       ax2.xaxis.set_major_formatter(dates.DateFormatter(''))
-      ax2.plot(FF.index.to_pydatetime(),FT,color='b',label="clean data")
+      ax2.plot(FF.index.to_pydatetime(),FT[0][0],color='b',label="clean data")
       ax2.set_ylabel('fahrenheit')
       year=str(int((FF.index.year).mean()))    
       ax2.set_xlabel(year)
@@ -166,7 +177,7 @@ def chooseSE2(start,end):#this function employed to zoom-in picture and choose e
       plt.clf()
      ######for the final figure################
       FF=df[sfinalforplot:efinalforplot]#FF is the DataFrame that include all the records you choosed to plot.
-      criteria=3.0*FF.values.std() # standard deviations
+      criteria=crit*FF.values.std() # standard deviations
       a=0
       for i in range(len(FF)-2):#replace the record value which exceed 3 times standard deviations by 'Nan'.
          diff1=abs(FF.values[i+1]-FF.values[i])
@@ -256,7 +267,7 @@ if mark=='*' or mark=='S':#if the input file start with the character '*',choose
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT,index=FF.index),
+              'Temp':Series(FT[0][0],index=FF.index),
               'Salinity':Series('99.999',index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
@@ -281,15 +292,14 @@ elif mark1=='Intensity':# if input file have the character'Intensity',call this 
       yd=getyearday(FF)
      #############c to f##################
       FT=[]
-      for k in range(len(FF.index)):
-          f=c2f(FF['Temp'][k])
-          FT.append(f)
+      f=c2f(FF['Temp'][k])
+      FT.append(f)
      ############output file###################
       PFDATA={'sitecode':Series(Sc,index=FF.index),
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn1,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT,index=FF.index),
+              'Temp':Series(FT[0][0],index=FF.index),
               'Salinity':Series('99.999',index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
@@ -327,16 +337,15 @@ else:# this is the third method to read-in data.
       yd=getyearday(FF)
     #############c to f##################
       FT=[]
-      for k in range(len(FF.index)):
-          f=c2f(FF['Temp'][k])
-          FT.append(f)
+      f=c2f(FF['Temp'][k])
+      FT.append(f)
      ############output file###################
 
       PFDATA={'sitecode':Series(Sc,index=FF.index),
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn1,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT,index=FF.index),
+              'Temp':Series(FT[0][0],index=FF.index),
               'Salinity':Series(dr['Salinity'],index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}

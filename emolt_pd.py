@@ -102,10 +102,10 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       fig=plt.figure(figsize=(8,5))
       ax = fig.add_subplot(111)
       ax.set_ylim(min(FF.values),max(FF.values))
-      if dt.index[-1]-dt.index[0]>timedelta(days=180):
-          intr=20
-      elif (dt.index[-1]-dt.index[0]>timedelta(days=30)) and (dt.index[-1]-dt.index[0]<=timedelta(days=180)):
-          intr=10     
+      if FF.index[-1]-FF.index[0]>timedelta(days=180):
+          intr=35
+      elif (FF.index[-1]-FF.index[0]>timedelta(days=30)) and (FF.index[-1]-FF.index[0]<=timedelta(days=180)):
+          intr=15     
       else:
           intr=2
       #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
@@ -118,16 +118,23 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       year=str(int((FF.index.year).mean()))    
       ax.set_xlabel(year)
       FT=[]
-      for k in range(len(FF.index)):#convert C to F
-          f=c2f(FF['Temp'][k])
-          FT.append(f)
+#     for k in range(len(FF.index)):#convert C to F
+      f=c2f(FF['Temp'])
+      FT.append(f)
       ax2=ax.twinx()
-      ax2.set_ylim(min(FT),max(FT))
-      ax2.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+      ax2.set_ylim(min(FT[0][0]),max(FT[0][0]))
+      if FF.index[-1]-FF.index[0]>timedelta(days=180):
+          intr=35
+      elif (FF.index[-1]-FF.index[0]>timedelta(days=30)) and (FF.index[-1]-FF.index[0]<=timedelta(days=180)):
+          intr=15     
+      else:
+          intr=2
+      #ax2.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+      ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
       ax2.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
       ax2.xaxis.set_major_locator(dates.MonthLocator())
       ax2.xaxis.set_major_formatter(dates.DateFormatter(''))
-      ax2.plot(FF.index.to_pydatetime(),FT,color='b',label="clean data")
+      ax2.plot(FF.index.to_pydatetime(),FT[0][0],color='b',label="clean data")
       ax2.set_ylabel('fahrenheit')
       year=str(int((FF.index.year).mean()))    
       ax2.set_xlabel(year)
@@ -260,7 +267,7 @@ if mark=='*' or mark=='S':#if the input file start with the character '*',choose
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT,index=FF.index),
+              'Temp':Series(FT[0][0],index=FF.index),
               'Salinity':Series('99.999',index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
@@ -285,15 +292,14 @@ elif mark1=='Intensity':# if input file have the character'Intensity',call this 
       yd=getyearday(FF)
      #############c to f##################
       FT=[]
-      for k in range(len(FF.index)):
-          f=c2f(FF['Temp'][k])
-          FT.append(f)
+      f=c2f(FF['Temp'][k])
+      FT.append(f)
      ############output file###################
       PFDATA={'sitecode':Series(Sc,index=FF.index),
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn1,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT,index=FF.index),
+              'Temp':Series(FT[0][0],index=FF.index),
               'Salinity':Series('99.999',index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
@@ -331,16 +337,15 @@ else:# this is the third method to read-in data.
       yd=getyearday(FF)
     #############c to f##################
       FT=[]
-      for k in range(len(FF.index)):
-          f=c2f(FF['Temp'][k])
-          FT.append(f)
+      f=c2f(FF['Temp'][k])
+      FT.append(f)
      ############output file###################
 
       PFDATA={'sitecode':Series(Sc,index=FF.index),
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn1,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT,index=FF.index),
+              'Temp':Series(FT[0][0],index=FF.index),
               'Salinity':Series(dr['Salinity'],index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
