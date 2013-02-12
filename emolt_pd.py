@@ -40,6 +40,7 @@ fn='mbn0111.csv'
 #Sc='xx01'
 Sc=fn[1:3].upper()+fn[3:5]
 dep='20.0'
+crit=3
 #Ps='01'
 Ps=fn[5:7]
 
@@ -78,7 +79,7 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       plt.clf()
      ######for the final figure################
       FF=df[sfinalforplot:efinalforplot]#FF is the DataFrame that include all the records you choosed to plot.
-      criteria=3.0*FF.values.std() # standard deviations
+      criteria=crit*FF.values.std() # standard deviations
 #      criteria=FF.values.std()
       a=0
       for i in range(len(FF)-2):#replace the record value which exceed 3 times standard deviations by 'Nan'.
@@ -167,7 +168,7 @@ def chooseSE2(start,end):#this function employed to zoom-in picture and choose e
       plt.clf()
      ######for the final figure################
       FF=df[sfinalforplot:efinalforplot]#FF is the DataFrame that include all the records you choosed to plot.
-      criteria=3.0*FF.values.std() # standard deviations
+      criteria=crit*FF.values.std() # standard deviations
       a=0
       for i in range(len(FF)-2):#replace the record value which exceed 3 times standard deviations by 'Nan'.
          diff1=abs(FF.values[i+1]-FF.values[i])
