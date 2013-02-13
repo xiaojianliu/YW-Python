@@ -47,7 +47,24 @@ Ps=fn[5:7]
 
 
 ############ define a def######################
+
 def chooseSE(start,end,skipr):#this function employed to zoom-in picture and choose exactly points
+      def ax(TimeDelta):
+          ax = fig.add_subplot(111)
+          if TimeDelta>timedelta(days=6):
+              intr=int(TimeDelta.days/6)    
+          else:
+              intr=2
+      #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+          ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
+          ax.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
+          years= matplotlib.dates.YearLocator()   # every year
+          yearsFmt = matplotlib.dates.DateFormatter('')
+          ax.xaxis.set_major_locator(years)
+          ax.xaxis.set_major_formatter(yearsFmt)
+#      ax.xaxis.set_major_locator(dates.MonthLocator())
+#      ax.xaxis.set_major_formatter(dates.DateFormatter(''))
+          return ax
       startfront=start[0]-2 # looking 2 day either side of the point clicked
       startback=start[0]+2
       sfforplot=(num2date(startfront)).replace(minute=0,second=0,microsecond=0).isoformat(" ")#transfer number to date and generate a appropriate date format
@@ -60,7 +77,6 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       sfinaltime=(num2date(sfinal[0][0])).replace(tzinfo=None)
       sfinalforplot=sfinaltime.replace(minute=0,second=0,microsecond=0).isoformat(" ")
       print sfinalforplot
-      #plt.close()
       plt.clf()
      #####for end point zoom figure###########
       #below coding is very similar with the up one, it employed to choose exactly point at the end side.
@@ -75,7 +91,6 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       efinaltime=(num2date(efinal[0][0])).replace(tzinfo=None)
       efinalforplot=efinaltime.replace(minute=0,second=0,microsecond=0).isoformat(" ")
       print efinalforplot
-      #plt.close()
       plt.clf()
      ######for the final figure################
       FF=df[sfinalforplot:efinalforplot]#FF is the DataFrame that include all the records you choosed to plot.
@@ -100,44 +115,31 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
           dt=DataFrame(dr['RawTemp'],index=dr.index)
       draw=dt[sfinalforplot:efinalforplot] 
       fig=plt.figure(figsize=(8,5))
-      ax = fig.add_subplot(111)
+      TimeDelta=FF.index[-1]-FF.index[0]
+      ax =ax(TimeDelta)
       ax.set_ylim(min(FF.values),max(FF.values))
-      if FF.index[-1]-FF.index[0]>timedelta(days=180):
-          intr=35
-      elif (FF.index[-1]-FF.index[0]>timedelta(days=30)) and (FF.index[-1]-FF.index[0]<=timedelta(days=180)):
-          intr=15     
-      else:
-          intr=2
-      #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
-      ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
-      ax.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
-      ax.xaxis.set_major_locator(dates.MonthLocator())
-      ax.xaxis.set_major_formatter(dates.DateFormatter(''))
       ax.plot(draw.index.to_pydatetime(),draw.values,color='r',label="raw data")
       ax.set_ylabel('celsius')
-      year=str(int((FF.index.year).mean()))    
+      year=str(int(FF.index[0].year))+'-'+str(int(FF.index[-1].year))   
       ax.set_xlabel(year)
       FT=[]
 #     for k in range(len(FF.index)):#convert C to F
       f=c2f(FF['Temp'])
       FT.append(f)
       ax2=ax.twinx()
-      ax2.set_ylim(min(FT[0][0]),max(FT[0][0]))
-      if FF.index[-1]-FF.index[0]>timedelta(days=180):
-          intr=35
-      elif (FF.index[-1]-FF.index[0]>timedelta(days=30)) and (FF.index[-1]-FF.index[0]<=timedelta(days=180)):
-          intr=15     
+      ax2.set_ylim(min(FT[0]),max(FT[0]))
+      if TimeDelta>timedelta(days=6):
+              intr=int(TimeDelta.days/6)    
       else:
-          intr=2
-      #ax2.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
-      ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
+              intr=2
+      ax2.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
       ax2.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
-      ax2.xaxis.set_major_locator(dates.MonthLocator())
-      ax2.xaxis.set_major_formatter(dates.DateFormatter(''))
-      ax2.plot(FF.index.to_pydatetime(),FT[0][0],color='b',label="clean data")
+      years= matplotlib.dates.YearLocator()   # every year
+      yearsFmt = matplotlib.dates.DateFormatter('')
+      ax2.xaxis.set_major_locator(years)
+      ax2.xaxis.set_major_formatter(yearsFmt)
+      ax2.plot(FT[0].index.to_pydatetime(),FT[0],color='b',label="clean data")
       ax2.set_ylabel('fahrenheit')
-      year=str(int((FF.index.year).mean()))    
-      ax2.set_xlabel(year)
       lines, labels = ax.get_legend_handles_labels()
       lines2, labels2 = ax2.get_legend_handles_labels()
       ax2.legend(lines + lines2, labels + labels2, loc=0)
@@ -267,7 +269,7 @@ if mark=='*' or mark=='S':#if the input file start with the character '*',choose
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT[0][0],index=FF.index),
+              'Temp':Series(FT[0].values,index=FF.index),
               'Salinity':Series('99.999',index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
@@ -299,7 +301,7 @@ elif mark1=='Intensity':# if input file have the character'Intensity',call this 
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn1,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT[0][0],index=FF.index),
+              'Temp':Series(FT[0].values,index=FF.index),
               'Salinity':Series('99.999',index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
@@ -345,7 +347,7 @@ else:# this is the third method to read-in data.
               'depth':Series(dep,index=FF.index),
               'sernum':Series(Sn1,index=FF.index),
               'probsetting':Series(Ps,index=FF.index),
-              'Temp':Series(FT[0][0],index=FF.index),
+              'Temp':Series(FT[0].values,index=FF.index),
               'Salinity':Series(dr['Salinity'],index=FF.index),
               'Datet':Series(FF.index,index=FF.index),
               'yearday':Series(yd,index=FF.index)}
