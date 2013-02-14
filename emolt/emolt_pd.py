@@ -23,6 +23,7 @@ from datetime import timedelta,datetime
 from matplotlib.dates import num2date,date2num
 import csv
 from conversions import c2f
+from utilities import my_x_axis_format
 from mpl_toolkits.axes_grid1 import host_subplot
 import string
 import matplotlib.dates as dates
@@ -46,19 +47,6 @@ Ps=fn[5:7]
 
 ############ define a def######################
 def chooseSE(start,end,skipr):#this function employed to zoom-in picture and choose exactly points
-      def my_x_axis_format(ax, dt):
-           if dt>timedelta(days=6):
-                intr=int(dt.days/6)
-           else:
-                intr=2
-    #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
-           ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
-           ax.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
-           years= matplotlib.dates.YearLocator() # every year
-           yearsFmt = matplotlib.dates.DateFormatter('')
-           ax.xaxis.set_major_locator(years)
-           ax.xaxis.set_major_formatter(yearsFmt) 
-           return ax
       startfront=start[0]-2 # looking 2 day either side of the point clicked
       startback=start[0]+2
       sfforplot=(num2date(startfront)).replace(minute=0,second=0,microsecond=0).isoformat(" ")#transfer number to date and generate a appropriate date format
