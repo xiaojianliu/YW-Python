@@ -44,27 +44,21 @@ crit=3
 #Ps='01'
 Ps=fn[5:7]
 
-
-
 ############ define a def######################
-
 def chooseSE(start,end,skipr):#this function employed to zoom-in picture and choose exactly points
-      def ax(TimeDelta):
-          ax = fig.add_subplot(111)
-          if TimeDelta>timedelta(days=6):
-              intr=int(TimeDelta.days/6)    
-          else:
-              intr=2
-      #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
-          ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
-          ax.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
-          years= matplotlib.dates.YearLocator()   # every year
-          yearsFmt = matplotlib.dates.DateFormatter('')
-          ax.xaxis.set_major_locator(years)
-          ax.xaxis.set_major_formatter(yearsFmt)
-#      ax.xaxis.set_major_locator(dates.MonthLocator())
-#      ax.xaxis.set_major_formatter(dates.DateFormatter(''))
-          return ax
+      def my_x_axis_format(ax, dt):
+           if dt>timedelta(days=6):
+                intr=int(dt.days/6)
+           else:
+                intr=2
+    #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+           ax.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
+           ax.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
+           years= matplotlib.dates.YearLocator() # every year
+           yearsFmt = matplotlib.dates.DateFormatter('')
+           ax.xaxis.set_major_locator(years)
+           ax.xaxis.set_major_formatter(yearsFmt) 
+           return ax
       startfront=start[0]-2 # looking 2 day either side of the point clicked
       startback=start[0]+2
       sfforplot=(num2date(startfront)).replace(minute=0,second=0,microsecond=0).isoformat(" ")#transfer number to date and generate a appropriate date format
@@ -116,7 +110,8 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       draw=dt[sfinalforplot:efinalforplot] 
       fig=plt.figure(figsize=(8,5))
       TimeDelta=FF.index[-1]-FF.index[0]
-      ax =ax(TimeDelta)
+      ax = fig.add_subplot(111)
+      my_x_axis_format(ax, TimeDelta)
       ax.set_ylim(min(FF.values),max(FF.values))
       ax.plot(draw.index.to_pydatetime(),draw.values,color='r',label="raw data")
       ax.set_ylabel('celsius')
@@ -127,17 +122,8 @@ def chooseSE(start,end,skipr):#this function employed to zoom-in picture and cho
       f=c2f(FF['Temp'])
       FT.append(f)
       ax2=ax.twinx()
+      my_x_axis_format(ax2, TimeDelta)
       ax2.set_ylim(min(FT[0]),max(FT[0]))
-      if TimeDelta>timedelta(days=6):
-              intr=int(TimeDelta.days/6)    
-      else:
-              intr=2
-      ax2.xaxis.set_minor_locator(dates.DayLocator(interval=intr))
-      ax2.xaxis.set_minor_formatter(dates.DateFormatter('%b%d'))
-      years= matplotlib.dates.YearLocator()   # every year
-      yearsFmt = matplotlib.dates.DateFormatter('')
-      ax2.xaxis.set_major_locator(years)
-      ax2.xaxis.set_major_formatter(yearsFmt)
       ax2.plot(FT[0].index.to_pydatetime(),FT[0],color='b',label="clean data")
       ax2.set_ylabel('fahrenheit')
       lines, labels = ax.get_legend_handles_labels()
