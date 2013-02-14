@@ -13,6 +13,20 @@ from datetime import timedelta as td
 import matplotlib.dates as mdates
 import colorsys
 
+def my_x_axis_format(ax, dt):
+           if dt>td(days=6):
+                intr=int(dt.days/6)
+           else:
+                intr=2
+    #ax.xaxis.set_minor_locator(dates.WeekdayLocator(byweekday=(1),interval=intr))
+           ax.xaxis.set_minor_locator(mdates.DayLocator(interval=intr))
+           ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b%d'))
+           years= mdates.YearLocator() # every year
+           yearsFmt = mdates.DateFormatter('')
+           ax.xaxis.set_major_locator(years)
+           ax.xaxis.set_major_formatter(yearsFmt) 
+           return ax
+
 def choose_date_label(start,end):
           
     delta = end - start
