@@ -457,7 +457,6 @@ def getemolt_latlon(site):
     lat = list(var.LAT_DDMM)
     lon = list(var.LON_DDMM)
     original_name = list(var.ORIGINAL_NAME)
-  
     return lat[0], lon[0], original_name
 
 
@@ -508,7 +507,7 @@ def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)]
     dataset = get_dataset(url + '"' + site + '"')
     var = dataset['emolt_sensor']
     print 'extracting eMOLT data using PyDap... hold on'
-    temp = list(var.temp)
+    temp = list(var.TEMP)
     depth = list(var.DEPTH_I)
     time0 = list(var.YRDAY0_LOCAL)
     year_month_day = list(var.TIME_LOCAL)
@@ -516,7 +515,7 @@ def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)]
     print 'Generating a datetime ... hold on'
     datet = []
     for i in scipy.arange(len(time0)):
-        datet.append(num2date(time0[i]).replace(year=time.strptime(year_month_day[i], '%Y-%m-%d').tm_year).replace(day=time.strptime(year_month_day[i], '%Y-%m-%d').tm_mday))
+        datet.append(num2date(time0[i]).replace(year=time.strptime(year_month_day[i], '%Y-%m-%d').tm_year).replace(month=time.strptime(year_month_day[i], '%Y-%m-%d').tm_mon).replace(day=time.strptime(year_month_day[i], '%Y-%m-%d').tm_mday))
  
     #get the index of sorted date_time
     print 'Sorting mooring data by time'
@@ -528,7 +527,7 @@ def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)]
     depth = [depth[i] for i in index]
 
     print 'Delimiting mooring data according to user-specified time'  
-    part_t,part_time = [], [], []
+    part_t,part_time,part_depth = [], [], []
     if len(input_time) == 2:
         start_time = input_time[0]
         end_time = input_time[1]
@@ -540,11 +539,11 @@ def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)]
         if (start_time <= datet[i] <= end_time) & (dep[0]<=depth[i]<= dep[1]):
             part_t.append(temp[i])
             part_time.append(num2date(datet[i]))
-
+            part_depth.append(depth[i])
     temp=part_t
     datet=part_time
-    
-    return datet,temp,start_time, end_time
+    depth=part_depth
+    return datet,temp,depth
 
 
 def getemolt_uv(site, input_time, dep):
