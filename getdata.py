@@ -1,5 +1,6 @@
 import csv
 import matplotlib
+from datetime import datetime
 from matplotlib.dates import date2num, num2date
 import datetime as dt
 import scipy
@@ -497,14 +498,10 @@ def getemolt_sensor(mindtime1,maxdtime1,i_mindepth,i_maxdepth,site2,mindtime,max
 	  return time1,yrday01,temp1,sites1,depth,
 
 
-def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)], dep=[0,1000]):
-    """
-    get data from url, return datetime, temperature, and start and end times
-    input_time can either contain two values: start_time & end_time OR one value:interval_days
-    """
+def getemolt_temp(site,k,input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)], dep=[0,1000]):
     url = 'http://gisweb.wh.whoi.edu:8080/dods/whoi/emolt_sensor?emolt_sensor.SITE,emolt_sensor.YRDAY0_LOCAL,emolt_sensor.TIME_LOCAL,emolt_sensor.TEMP,emolt_sensor.DEPTH_I&emolt_sensor.SITE='
     # get the emolt_sensor data
-    dataset = get_dataset(url + '"' + site + '"')
+    dataset = get_dataset(url + '"' + site[k] + '"')
     var = dataset['emolt_sensor']
     print 'extracting eMOLT data using PyDap... hold on'
     temp = list(var.TEMP)
@@ -514,9 +511,12 @@ def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)]
   
     print 'Generating a datetime ... hold on'
     datet = []
-    for i in scipy.arange(len(time0)):
-        datet.append(num2date(time0[i]).replace(year=time.strptime(year_month_day[i], '%Y-%m-%d').tm_year).replace(month=time.strptime(year_month_day[i], '%Y-%m-%d').tm_mon).replace(day=time.strptime(year_month_day[i], '%Y-%m-%d').tm_mday))
- 
+#       for i in scipy.arange(len(time0)):
+#            datet.append(num2date(time0[i]+1.0).replace(year=time.strptime(year_month_day[i], '%Y-%m-%d').tm_year).replace(day=time.strptime(year_month_day[i], '%Y-%m-%d').tm_mday))
+
+        # Yacheng realized we do not really care about the hours-minutes-seconds so we can just use the days
+    for i in scipy.arange(len(year_month_day)):
+            datet.append(datetime.strptime(year_month_day[i],'%Y-%m-%d'))
     #get the index of sorted date_time
     print 'Sorting mooring data by time'
     index = range(len(datet))
@@ -525,25 +525,24 @@ def getemolt_temp(site, input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)]
     datet = [datet[i] for i in index]
     temp = [temp[i] for i in index]
     depth = [depth[i] for i in index]
-
     print 'Delimiting mooring data according to user-specified time'  
     part_t,part_time,part_depth = [], [], []
     if len(input_time) == 2:
-        start_time = input_time[0]
-        end_time = input_time[1]
+            start_time = input_time[0]
+            end_time = input_time[1]
     if len(input_time) == 1:
-        start_time = datet[0]
-        end_time = start_time + input_time[0]
+            start_time = datet[0]
+            end_time = start_time + input_time[0]
     print datet[0], datet[-1]
     for i in range(0, len(temp)):
-        if (start_time <= datet[i] <= end_time) & (dep[0]<=depth[i]<= dep[1]):
-            part_t.append(temp[i])
-            part_time.append(num2date(datet[i]))
-            part_depth.append(depth[i])
+            if (start_time <= datet[i] <= end_time) & (dep[0]<=depth[i]<= dep[1]):
+                part_t.append(temp[i])
+                part_time.append(datet[i])
+                part_depth.append(depth[i])
     temp=part_t
     datet=part_time
     depth=part_depth
-    return datet,temp,depth
+    return datet,temp,depth   
 
 
 def getemolt_uv(site, input_time, dep):
