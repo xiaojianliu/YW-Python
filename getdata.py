@@ -447,19 +447,31 @@ def getemolt_depth(b_mindepth,b_maxdepth,lat_max,lon_max,lat_min,lon_min,site1):
     lon_dd=list(emolt_site['LON_DDMM'])
     return sites,depth_b,lat_dd,lon_dd
 
-
-def getemolt_latlon(site):
+'''
+def getemolt_latlon(site,k):
     """
     get data from emolt_sensor 
     """
     urllatlon = 'http://gisweb.wh.whoi.edu:8080/dods/whoi/emolt_site?emolt_site.SITE,emolt_site.LAT_DDMM,emolt_site.LON_DDMM,emolt_site.ORIGINAL_NAME&emolt_site.SITE='
-    dataset = open_url(urllatlon + site)
+    dataset = open_url(urllatlon + site[k])
     var = dataset['emolt_site']
     lat = list(var.LAT_DDMM)
     lon = list(var.LON_DDMM)
     original_name = list(var.ORIGINAL_NAME)
     return lat[0], lon[0], original_name
-
+'''
+def getemolt_latlon(site,k):
+    """
+    get data from emolt_sensor 
+    """
+    urllatlon = 'http://gisweb.wh.whoi.edu:8080/dods/whoi/emolt_site?emolt_site.SITE,emolt_site.LAT_DDMM,emolt_site.LON_DDMM,emolt_site.ORIGINAL_NAME&emolt_site.SITE="'+site[k]+'"'
+    print urllatlon    
+    dataset = open_url(urllatlon)
+    var = dataset['emolt_site']
+    lat = list(var.LAT_DDMM)
+    lon = list(var.LON_DDMM)
+    original_name = list(var.ORIGINAL_NAME)
+    return lat[0], lon[0], original_name
 
 def getemolt_sensor(mindtime1,maxdtime1,i_mindepth,i_maxdepth,site2,mindtime,maxdtime):
 	  #According to the conditions to select data from "emolt_sensor"
@@ -507,8 +519,7 @@ def getemolt_temp(site,k,input_time=[dt.datetime(1880,1,1),dt.datetime(2020,1,1)
     temp = list(var.TEMP)
     depth = list(var.DEPTH_I)
     time0 = list(var.YRDAY0_LOCAL)
-    year_month_day = list(var.TIME_LOCAL)
-  
+    year_month_day = list(var.TIME_LOCAL)  
     print 'Generating a datetime ... hold on'
     datet = []
 #       for i in scipy.arange(len(time0)):
