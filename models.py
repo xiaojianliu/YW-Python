@@ -9,6 +9,24 @@ import matplotlib.mlab as ml
 import scipy
 import time
 import matplotlib.pyplot as plt
+import pandas as pd
+import netCDF4
+
+def get_mod_bottom_temp(lati,loni,starttime,endtime,depth):
+        urlfvcom = 'http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3'
+        nc = netCDF4.Dataset(urlfvcom)
+        nc.variables
+        lat = nc.variables['lat'][:]
+        lon = nc.variables['lon'][:]
+        times = nc.variables['time']
+        jd = netCDF4.num2date(times[:],times.units)
+        vname = 'temp'
+        var = nc.variables[vname]
+
+        inode = nearxy(lon,lat,loni,lati)
+        modindex=netCDF4.date2index([starttime,endtime],times,select='nearest')
+        modtso=pd.DataFrame(var[modindex[0]:modindex[1],depth,inode],index=jd[modindex[0]:modindex[1]])    
+        return modtso,var,inode
 
 def get_dataset(url):
     try:    
