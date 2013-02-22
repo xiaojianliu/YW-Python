@@ -11,22 +11,9 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 import netCDF4
+from basemap import basemap_usgs
 
-def get_mod_bottom_temp(lati,loni,starttime,endtime,depth):
-        urlfvcom = 'http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3'
-        nc = netCDF4.Dataset(urlfvcom)
-        nc.variables
-        lat = nc.variables['lat'][:]
-        lon = nc.variables['lon'][:]
-        times = nc.variables['time']
-        jd = netCDF4.num2date(times[:],times.units)
-        vname = 'temp'
-        var = nc.variables[vname]
 
-        inode = nearxy(lon,lat,loni,lati)
-        modindex=netCDF4.date2index([starttime,endtime],times,select='nearest')
-        modtso=pd.DataFrame(var[modindex[0]:modindex[1],depth,inode],index=jd[modindex[0]:modindex[1]])    
-        return modtso,var,inode
 
 def get_dataset(url):
     try:    
@@ -133,6 +120,29 @@ def getFVCOM_bottom_temp(url, time0, mlon, mlat):
     temperature = list(temp[index_time, :, index_location_h])
             
     return depths, temperature
+    
+def getFVCOM_bottom_temp_netcdf(lati,loni,starttime,endtime,layer):
+        '''
+        generate mod data as a DataFrame
+        according to time and local position
+        different from getFVCOM_bottom_temp:
+        this function only return time-temp dataframe and ues netcdf4
+        getFVCOM_bottom_temp return depth and temp 
+        '''
+        urlfvcom = 'http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3'
+        nc = netCDF4.Dataset(urlfvcom)
+        nc.variables
+        lat = nc.variables['lat'][:]
+        lon = nc.variables['lon'][:]
+        times = nc.variables['time']
+        jd = netCDF4.num2date(times[:],times.units)
+        vname = 'temp'
+        var = nc.variables[vname]
+
+        inode = nearxy(lon,lat,loni,lati)
+        modindex=netCDF4.date2index([starttime,endtime],times,select='nearest')
+        modtso=pd.DataFrame(var[modindex[0]:modindex[1],layer,inode],index=jd[modindex[0]:modindex[1]])    
+        return modtso
 
 def getmodel_GOMPOM(mlat, mlon, depth_i, stime, etime, dataset):
     "use this function to get 'GOMPOM'"
@@ -776,7 +786,7 @@ def model_plot_track(depth, jdmat_m, lat_vel_1, lon_vel_1, u, v, lat_vel, lon_ve
                 lon_k.append(float(lon1 + lon_k[i - 1] + float(uu[i] * daystep * 24 * 3600) / 1000 / 1.8535 / 60 * scipy.cos(float(lat_k[i]) / 180 * np.pi)) / 2)
               
             plt.plot(lon_k, lat_k, "-", linewidth=1, marker=".", markerfacecolor='r')
-            basemap([min(lat_k) - 2, max(lat_k) + 2], [min(lon_k) - 2, max(lon_k) + 2])
+            basemap_usgs([min(lat_k) - 2, max(lat_k) + 2], [min(lon_k) - 2, max(lon_k) + 2])
             # make same size for the panels
             min_lat, max_lon, max_lat, min_lon = [], [], [], []
             min_lat.append(min(lat_k))
