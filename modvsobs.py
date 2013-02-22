@@ -5,10 +5,9 @@ Created on Wed Feb 20 09:15:34 2013
 @author: jmanning
 """
 import matplotlib.pyplot as plt
-import netCDF4
 from getdata import getemolt_latlon,getemolt_temp
 from conversions import dm2dd,f2c
-from utilities import nearxy,my_x_axis_format
+from utilities import my_x_axis_format
 import pandas as pd
 from numpy import float64
 from datetime import datetime, timedelta
@@ -92,21 +91,7 @@ def diffdadc(diff,output_fmt):
         difff=diff.reindex(columns=output_fmt)
         difff.columns=['date','mean','median','min','max','std']
         return difff
-def get_mod_bottom_temp(lati,loni,starttime,endtime,depth):
-        urlfvcom = 'http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3'
-        nc = netCDF4.Dataset(urlfvcom)
-        nc.variables
-        lat = nc.variables['lat'][:]
-        lon = nc.variables['lon'][:]
-        times = nc.variables['time']
-        jd = netCDF4.num2date(times[:],times.units)
-        vname = 'temp'
-        var = nc.variables[vname]
 
-        inode = nearxy(lon,lat,loni,lati)
-        modindex=netCDF4.date2index([starttime,endtime],times,select='nearest')
-        modtso=pd.DataFrame(var[modindex[0]:modindex[1],depth,inode],index=jd[modindex[0]:modindex[1]])    
-        return modtso,var,inode
 
 site=['AG01','BA01']
 minnumperday=18
