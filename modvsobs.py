@@ -118,18 +118,16 @@ for k in range(len(site)):
         inode = nearxy(lon,lat,loni,lati)
         modindex=netCDF4.date2index([obs_dt[0],obs_dt[-1]],times,select='nearest')
         modtso=pd.DataFrame(var[modindex[0]:modindex[1],44,inode],index=jd[modindex[0]:modindex[1]])
-##############creat mod da#############
+#####################################################
         [remodda,remoddaf]=resamda(modtso) 
         remoddaf.to_csv(site[k]+'_wtmp_da_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')   
-############creat mod ma#############
         [remodma,remodmaf]=resamma(modtso)
         remodmaf.to_csv(site[k]+'_wtmp_ma_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')  
-############creat mod dc##############
         [remoddc,remoddcf]=resamdc(remodda)        
         remoddcf.to_csv(site[k]+'_wtmp_dc_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
-############creat mod mc##############
         [modmc,modmcf]=resammc(remoddc)
         modmcf.to_csv(site[k]+'_wtmp_mc_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+        
 ##############plot da compare figure##################
         fig=plt.figure(figsize=(16,10))
         ax=fig.add_subplot(211)
@@ -178,6 +176,3 @@ for k in range(len(site)):
         diffdaf.to_csv(site[k]+'_wtmp_da_mod_da_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
         diffdcf=diffdadc(diffdc,output_fmt)
         diffdcf.to_csv(site[k]+'_wtmp_dc_mod_dc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
-        
-        
-#####################
