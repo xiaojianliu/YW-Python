@@ -11,7 +11,7 @@ from utilities import my_x_axis_format
 import pandas as pd
 from numpy import float64
 from datetime import datetime, timedelta
-from models import get_mod_bottom_temp
+from models import getFVCOM_bottom_temp_netcdf
 
 
 def resamda(oritso):
@@ -120,7 +120,7 @@ for k in range(len(site)):
 
         starttime=obs_dt[0]
         endtime=obs_dt[-1]
-        [modtso,var,inode]=get_mod_bottom_temp(lati,loni,starttime,endtime,depth=44)
+        modtso=getFVCOM_bottom_temp_netcdf(lati,loni,starttime,endtime,layer=44)
 ##############generate resample DataFrame and putput file#############
         remoddaf=resamda(modtso) 
         remoddaf.to_csv(site[k]+'_wtmp_da_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')   
@@ -136,8 +136,8 @@ for k in range(len(site)):
         ax.plot_date(obs_dt,obs_temp,fmt='-')
         plt.grid()
         ax.plot_date(modtso.index,modtso.values,fmt='-',color='red')#bottom most value equals 44
-        plt.ylabel(var.units)
-        plt.title('eMOLT site '+site[k]+' temp vs FVCOM '+'%s at node=%d' % ('temp', inode+1))
+        plt.ylabel('degree c')
+        plt.title('eMOLT site '+site[k]+' temp vs FVCOM ')
         plt.legend(['observed','modeled'],loc='best')
 #        plt.show()
 ###############plot mc compare figure##################
@@ -147,8 +147,8 @@ for k in range(len(site)):
         ax1.plot_date(reobsmcf.index,reobsmcf['mean'],fmt='-')
         plt.grid()
         ax1.plot_date(remodmcf.index,remodmcf['mean'],fmt='-',color='red')#bottom most value equals 44
-        plt.ylabel(var.units)
-        plt.title('eMOLT site '+site[k]+' temp vs FVCOM '+'%s at node=%d' % ('temp', inode+1))
+        plt.ylabel('degree c')
+        plt.title('eMOLT site '+site[k]+' temp vs FVCOM ')
 #        plt.title('eMOLT site '+site[k]+' temp vs FVCOM '+'%s at node=%d (Lon=%.4f, Lat=%.4f)' % ('temp', inode+1, lon[inode], lat[inode]))
         plt.legend(['observed','modeled'],loc='best')
         plt.show()
