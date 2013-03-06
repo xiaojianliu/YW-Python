@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 ######################################################   
-
-df=pd.read_csv('site.csv',sep=',',skiprows=1,index_col=0,names=['site','lat','lon'])
+threesite=['AB01','JS06','BN01']
+df=pd.read_csv('ProcessedSite.csv',sep=',',skiprows=1,index_col=0,names=['site','lat','lon'])
 for i in range(len(df)):
     (a,b)=divmod(float(df['lat'][i]),100)   
     aa=int(a)
@@ -32,13 +32,18 @@ m.drawmeridians(np.arange(int(min(lonsize)),int(max(lonsize))+1,1),labels=[0,0,0
 m.drawcoastlines()
 m.fillcontinents(color='grey')
 m.drawmapboundary()
-x, y = m(-df['lon'].values[:10],df['lat'].values[:10])
-m.scatter(x,y,10,marker='o',color='r')
-if len(x)<=50:
+x, y = m(-df['lon'].values,df['lat'].values)
+m.scatter(x,y,20,marker='o',color='r')
+for i in range(len(x)):
+    if df.index[i] in threesite:
+             print df.index[i]
+             plt.annotate(df.index[i],xy=(x[i],y[i]),xytext=(x[i]+0.51,y[i]-0.75),arrowprops=dict(facecolor='black',shrink=0.05));
+    
+if len(x)<=10:
      for i in range(len(x)):
-         plt.text(x[i],y[i],df.index[i],fontsize=10,fontweight='normal',ha='center',va='top',color='b')
-
-plt.title('emolt_site')
+         plt.text(x[i],y[i],df.index[i],fontsize=13,fontweight='normal',ha='right',va='baseline',color='b')
+plt.title('emolt bottom temperature site')
 plt.show()
+plt.savefig('EmoltBottomSite.png')
 
    
