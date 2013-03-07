@@ -23,7 +23,7 @@ for i in range(len(df)):
     dd=float(d)
     df['lon'][i]=cc+(dd/60)
 latsize=[40.0,45.0]
-lonsize=[-73.,-68.0]
+lonsize=[-72.,-67.0]
 plt.figure(figsize=(7,6))
 m = Basemap(projection='cyl',llcrnrlat=min(latsize)-0.01,urcrnrlat=max(latsize)+0.01,\
             llcrnrlon=min(lonsize)-0.01,urcrnrlon=max(lonsize)+0.01,resolution='h')#,fix_aspect=False)
@@ -37,13 +37,13 @@ m.scatter(x,y,20,marker='o',color='r')
 for i in range(len(x)):
     if df.index[i] in threesite:
              print df.index[i]
-             plt.annotate(df.index[i],xy=(x[i],y[i]),xytext=(x[i]+0.51,y[i]-0.75),arrowprops=dict(facecolor='black',shrink=0.05));
-    
+             #plt.annotate(df.index[i],xy=(x[i],y[i]),xytext=(x[i]+0.51,y[i]-0.75),arrowprops=dict(facecolor='black',shrink=0.05));
+             plt.annotate(df.index[i],xy=(x[i],y[i]),xytext=(x[i]+0.51,y[i]-0.75),arrowprops=dict(arrowstyle="-|>",connectionstyle="arc3,rad=-0.2",fc="w"));
 if len(x)<=10:
      for i in range(len(x)):
          plt.text(x[i],y[i],df.index[i],fontsize=13,fontweight='normal',ha='right',va='baseline',color='b')
-plt.title('emolt bottom temperature site')
+plt.title('emolt temperature site')
 plt.show()
-plt.savefig('EmoltBottomSite.png')
+plt.savefig('EmoltSite.png')
 
    
