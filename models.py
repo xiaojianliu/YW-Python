@@ -121,7 +121,7 @@ def getFVCOM_bottom_temp(url, time0, mlon, mlat):
             
     return depths, temperature
     
-def getFVCOM_bottom_temp_netcdf(lati,loni,starttime,endtime,layer):
+def getFVCOM_bottom_tempsalt_netcdf(lati,loni,starttime,endtime,layer,vname):#vname='temp'or'salinity'
         '''
         generate mod data as a DataFrame
         according to time and local position
@@ -136,9 +136,8 @@ def getFVCOM_bottom_temp_netcdf(lati,loni,starttime,endtime,layer):
         lon = nc.variables['lon'][:]
         times = nc.variables['time']
         jd = netCDF4.num2date(times[:],times.units)
-        vname = 'temp'
         var = nc.variables[vname]
-
+        print 'Now find the coincide timestample'
         inode = nearxy(lon,lat,loni,lati)
         modindex=netCDF4.date2index([starttime,endtime],times,select='nearest')
         modtso=pd.DataFrame(var[modindex[0]:modindex[1],layer,inode],index=jd[modindex[0]:modindex[1]])    
