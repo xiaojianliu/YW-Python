@@ -7,14 +7,14 @@ documented at http://www.nefsc.noaa.gov/epd/ocean/MainPage/py/modvsobs/html/inde
 
 
 import matplotlib.pyplot as plt
-from getdata import getemolt_latlon,getemolt_temp
+from getdata import getemolt_latlon,getobs_tempsalt
 from conversions import dm2dd,f2c
 from utilities import my_x_axis_format
 import pandas as pd
 from numpy import float64
 from datetime import datetime, timedelta
-from models import getFVCOM_bottom_temp_netcdf
-
+from models import getFVCOM_bottom_tempsalt_netcdf
+import datetime as dt
 
 def resamda(oritso):
         '''
@@ -23,6 +23,7 @@ def resamda(oritso):
         '''     
         resamda=float64(oritso[0]).resample('D',how=['count','mean','median','min','max','std'])
         resamda.ix[resamda['count']<minnumperday,['mean','median','min','max','std']] = 'NaN'
+        
         resamda['yy']=resamda.index.year
         resamda['mm']=resamda.index.month
         resamda['dd']=resamda.index.day
@@ -95,53 +96,93 @@ def diffdadc(diff,output_fmt):
         return difff
 
 
-site=['AG01']
+site=['AG01']#'AG01','ET01','GS01','JA01','JC01','JT04','KO01','MF02','MM01','MW01','NL01','PF01','PM02','PM03','PW01','RA01','RM02','RM04','SJ01','TA14','TA15','TS01']
 siteprocess=[]
 minnumperday=18
 numperday=24
+intend_to='temp'
+surf_or_bott='bott'
 for k in range(len(site)):
 #################read-in obs data##################################
-        [lati,loni,on]=getemolt_latlon(site[k]) # extracts lat/lon based on site code
-        [lati,loni]=dm2dd(lati,loni) #converts decimal-minutes to decimal degrees
+        print site[k]
+        [lati,loni,on,bd]=getemolt_latlon(site[k]) # extracts lat/lon based on site code
+        [lati,loni]=dm2dd(lati,loni)#converts decimal-minutes to decimal degrees
+        '''           
         [obs_dt,obs_temp]=getemolt_temp(site[k]) # extracts time series
         obs_dtindex=[]
         for kk in range(len(obs_temp)):
             obs_temp[kk]=f2c(obs_temp[kk]) # converts to Celcius
             obs_dtindex.append(datetime.strptime(str(obs_dt[kk])[:10],'%Y-%m-%d'))
-        obstso=pd.DataFrame(obs_temp,index=obs_dtindex)
+        '''
+        if surf_or_bott=='bott':
+            dept=[bd[0]-0.25*bd[0],bd[0]+.25*bd[0]]
+        else:
+            dept=[0,5]
+        (obs_dt,obs_temp,obs_salt)=getobs_tempsalt(site[k], input_time=[dt.datetime(1880,1,1),dt.datetime(2010,12,31)], dep=dept)
+        obs_dtindex=[]
+        if intend_to=='temp':            
+            for kk in range(len(obs_temp)):
+                obs_temp[kk]=f2c(obs_temp[kk]) # converts to Celcius
+                obs_dtindex.append(datetime.strptime(str(obs_dt[kk])[:10],'%Y-%m-%d'))
+            obstso=pd.DataFrame(obs_temp,index=obs_dtindex)
+        else:
+            for kk in range(len(obs_salt)):
+                obs_dtindex.append(datetime.strptime(str(obs_dt[kk])[:10],'%Y-%m-%d'))
+            obstso=pd.DataFrame(obs_salt,index=obs_dtindex)   
+        print 'obs Dataframe is ready'
 
 ##################generate resample DataFrame and putput file################################################
-        reobsdaf=resamda(obstso) 
-        reobsdaf.to_csv(site[k]+'_wtmp_da_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')   
+        reobsdaf=resamda(obstso)
         reobsmaf=resamma(obstso)
-        reobsmaf.to_csv(site[k]+'_wtmp_ma_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')  
-        reobsdcf=resamdc(reobsdaf)        
-        reobsdcf.to_csv(site[k]+'_wtmp_dc_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+        reobsdcf=resamdc(reobsdaf)
         reobsmcf=resammc(reobsdcf)
-        reobsmcf.to_csv(site[k]+'_wtmp_mc_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+        reobsdaf.to_csv(site[k]+surf_or_bott+intend_to+'_da_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+        reobsmaf.to_csv(site[k]+surf_or_bott+intend_to+'_ma_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+        reobsdcf.to_csv(site[k]+surf_or_bott+intend_to+'_dc_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+        reobsmcf.to_csv(site[k]+surf_or_bott+intend_to+'_mc_obs.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
 ###################read-in mod data#################################
 
-        starttime=obs_dt[0]
-        endtime=obs_dt[-1]
+        starttime=obs_dt[0].replace(tzinfo=None)
+        endtime=obs_dt[-1].replace(tzinfo=None)
         try:
-            modtso=getFVCOM_bottom_temp_netcdf(lati,loni,starttime,endtime,layer=44)
+            modtso=getFVCOM_bottom_tempsalt_netcdf(lati,loni,starttime,endtime,layer=44,vname='temp')##############notice there vname'temp'or'salinity'
+            print 'now filter data to make daily obs and mod coincide.'
+ 
+              
 ##############generate resample DataFrame and putput file#############
-            remoddaf=resamda(modtso) 
-            remoddaf.to_csv(site[k]+'_wtmp_da_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')   
+            remoddaf=resamda(modtso)
+            remoddaf['mean'] += reobsdaf['mean']*0
+            remoddaf['median'] += reobsdaf['median']*0
+            remoddaf['min'] += reobsdaf['min']*0
+            remoddaf['max'] += reobsdaf['max']*0
+            remoddaf['std'] += reobsdaf['std']*0
+        
+            print 'now filter data to make monthly obs and mod coincide.'
             remodmaf=resamma(modtso)
-            remodmaf.to_csv(site[k]+'_wtmp_ma_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')  
-            remoddcf=resamdc(remoddaf)        
-            remoddcf.to_csv(site[k]+'_wtmp_dc_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+            remodmaf['mean'] += reobsmaf['mean']*0
+            remodmaf['median'] += reobsmaf['median']*0   
+            remodmaf['min'] += reobsmaf['min']*0
+            remodmaf['max'] += reobsmaf['max']*0
+            remodmaf['std'] += reobsmaf['std']*0
+#             if remodmaf.index.year[i] in reobsmaf.index.year and remodmaf.index.month[i] in reobsmaf.index.month:
+            remoddcf=resamdc(remoddaf)
             remodmcf=resammc(remoddcf)
-            remodmcf.to_csv(site[k]+'_wtmp_mc_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+            remoddaf.to_csv(site[k]+surf_or_bott+intend_to+'_da_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+            remodmaf.to_csv(site[k]+surf_or_bott+intend_to+'_ma_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+            remoddcf.to_csv(site[k]+surf_or_bott+intend_to+'_dc_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+            remodmcf.to_csv(site[k]+surf_or_bott+intend_to+'_mc_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
+            print 'now prepare plot'
 ##############plot da compare figure##################
             fig=plt.figure(figsize=(16,10))
             ax=fig.add_subplot(211)
-            ax.plot_date(obs_dt,obs_temp,fmt='-')
+            ax.plot_date(reobsdaf.index,reobsdaf['mean'],fmt='-')
             plt.grid()
-            ax.plot_date(modtso.index,modtso.values,fmt='-',color='red')#bottom most value equals 44
-            plt.ylabel('degree c')
-            plt.title('eMOLT site '+site[k]+' temp vs FVCOM ')
+            ax.plot_date(remoddaf.index,remoddaf['mean'],fmt='-',color='red')#bottom most value equals 44
+            if intend_to=='temp':
+                plt.ylabel('degree c')
+            else:
+                plt.ylabel('salinity')
+            plt.title('eMOLT site '+site[k]+surf_or_bott+intend_to+' vs FVCOM ')
             plt.legend(['observed','modeled'],loc='best')
 #        plt.show()
 ###############plot mc compare figure##################
@@ -151,12 +192,14 @@ for k in range(len(site)):
             ax1.plot_date(reobsmcf.index,reobsmcf['mean'],fmt='-')
             plt.grid()
             ax1.plot_date(remodmcf.index,remodmcf['mean'],fmt='-',color='red')#bottom most value equals 44
-            plt.ylabel('degree c')
-            plt.title('eMOLT site '+site[k]+' temp vs FVCOM ')
-#        plt.title('eMOLT site '+site[k]+' temp vs FVCOM '+'%s at node=%d (Lon=%.4f, Lat=%.4f)' % ('temp', inode+1, lon[inode], lat[inode]))
+            if intend_to=='temp':
+                plt.ylabel('degree c')
+            else:
+                plt.ylabel('salinity')
+            plt.title('eMOLT site '+site[k]+surf_or_bott+intend_to+' vs FVCOM ')
             plt.legend(['observed','modeled'],loc='best')
             plt.show()
-            plt.savefig(site[k]+'da_mc_mod_obs.png')
+            plt.savefig(site[k]+surf_or_bott+intend_to+'_mod_obs.png')
 ############calculate the different#######################
             output_fmt=[0,'mean','median','min','max','std']
             diffmc=reobsmcf-remodmcf
@@ -164,7 +207,7 @@ for k in range(len(site)):
             diffmc=diffmc.join(month)
             diffmcf=diffmc.reindex(columns=output_fmt)
             diffmcf.columns=['month','mean','median','min','max','std']
-            diffmcf.to_csv(site[k]+'_wtmp_mc_mod_mc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
+            diffmcf.to_csv(site[k]+surf_or_bott+intend_to+'_mc_mod_mc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
 
             diffma=reobsmaf-remodmaf
             date=[]
@@ -174,21 +217,22 @@ for k in range(len(site)):
             diffma=diffma.join(datetimepd)
             diffmaf=diffma.reindex(columns=output_fmt)
             diffmaf.columns=['Year-Month','mean','median','min','max','std']
-            diffmaf.to_csv(site[k]+'_wtmp_ma_mod_ma_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
+            diffmaf.to_csv(site[k]+surf_or_bott+intend_to+'_ma_mod_ma_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
 
             diffda=reobsdaf-remoddaf
             diffdc=reobsdcf-remoddcf
 
             diffdaf=diffdadc(diffda,output_fmt)
-            diffdaf.to_csv(site[k]+'_wtmp_da_mod_da_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
+            diffdaf.to_csv(site[k]+surf_or_bott+intend_to+'_da_mod_da_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
             diffdcf=diffdadc(diffdc,output_fmt)
-            diffdcf.to_csv(site[k]+'_wtmp_dc_mod_dc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
+            diffdcf.to_csv(site[k]+surf_or_bott+intend_to+'_dc_mod_dc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
             siteprocess.append(site[k])
         except:
             k+=1
+
 print 'processed sites include'+str(siteprocess)+'.'
 import pickle
 f = open('ProcessedSite.csv', 'w')
 pickle.dump(siteprocess, f)
 f.close()
-            
+        
