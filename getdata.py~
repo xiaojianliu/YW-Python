@@ -135,6 +135,21 @@ def getcodar1(url, starttime, endtime):
     return jdmat_m, lat_vel, lon_vel, u, v
 
 
+def getemolt_latlon(site):
+    """
+    get data from emolt_sensor 
+    """
+    urllatlon = 'http://gisweb.wh.whoi.edu:8080/dods/whoi/emolt_site?emolt_site.SITE,emolt_site.LAT_DDMM,emolt_site.LON_DDMM,emolt_site.ORIGINAL_NAME,emolt_site.BTM_DEPTH&emolt_site.SITE='
+    dataset = open_url(urllatlon+'"'+site+'"')
+    print dataset
+    var = dataset['emolt_site']
+    lat = list(var.LAT_DDMM)
+    lon = list(var.LON_DDMM)
+    original_name = list(var.ORIGINAL_NAME)
+    bd=list(var.BTM_DEPTH)  
+    return lat[0], lon[0], original_name,bd
+
+
 def getcodar_ctl_file(inputfilename):
 #open file and read,It is used for get model data
   f=open(inputfilename)  
@@ -459,7 +474,7 @@ def getemolt_latlon(site,k):
     lon = list(var.LON_DDMM)
     original_name = list(var.ORIGINAL_NAME)
     return lat[0], lon[0], original_name
-'''
+
 def getemolt_latlon(site,k):
     """
     get data from emolt_sensor 
@@ -472,7 +487,7 @@ def getemolt_latlon(site,k):
     lon = list(var.LON_DDMM)
     original_name = list(var.ORIGINAL_NAME)
     return lat[0], lon[0], original_name
-
+'''
 def getemolt_sensor(mindtime1,maxdtime1,i_mindepth,i_maxdepth,site2,mindtime,maxdtime):
 	  #According to the conditions to select data from "emolt_sensor"
 	 
