@@ -1,0 +1,19 @@
+Modvsobs
+======
+--'clim.py' is the origin version of modvsobs.py
+
+--'modvsobs.py' is the main program employed to get model and observed data and compared them then plot figure and generate output files.
+
+--'daplot.py' is the program plots the daily average of model and observed data
+
+--'mcplot.py' is the program plots the Jan-Dec monthly average of model and observed data
+
+--'totalplot.py' is the program plots the difference between model and observed data at specified sites
+
+--'totalcaculate.py' is the program generate a table to show the difference between model and observed data at specified sites.
+
+--'getsite.py' is the program employed to get the specified sites information.'site.csv' is its input file and 'ProcessedSite.csv'is output file  
+
+--'sitemap.py' is the program plots a map show the sites which we processed their data.'ProcessedSite.csv' is its input file.'EmoltSite.png' is its output file.
+
+-- 'warmcold.py' is the program plot a map show the difference at sites which we processed.red represents obs-mod>=0, blue represents obs-mod<0, the bigger point is, the bigger difference is. 
