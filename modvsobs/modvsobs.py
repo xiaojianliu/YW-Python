@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from models import getFVCOM_bottom_tempsalt_netcdf
 import datetime as dt
 
+
 def resamda(oritso):
         '''
         resample daily average data
@@ -85,22 +86,24 @@ def resammc(resamdc):
         resammcf=resammc.reindex(columns=output_fmt)# found I needed to generate a new dataframe to print in this order
         return resammcf
 
-def diffdadc(diff,output_fmt):
+def diffdadc(diff):
         day=[]
         for i in range(len(diff)):
             day.append(str(diff.index[i].year)+'-'+str(diffda.index[i].month)+'-'+str(diffda.index[i].day))
-        daydadctime=pd.DataFrame(day,index=diff.index)
-        diff=diff.join(daydadctime)
-        difff=diff.reindex(columns=output_fmt)
-        difff.columns=['date','mean','median','min','max','std']
-        return difff
+        #daydadctime=pd.DataFrame(day,index=diff.index)
+        #diff=diff.join(daydadctime)
+        #difff=diff.reindex(columns=output_fmt)
+        diff['date']=day
+        diff.columns=['date','mean','median','min','max','std']
+        return diff
 
 
-site=['AG01']#'AG01','ET01','GS01','JA01','JC01','JT04','KO01','MF02','MM01','MW01','NL01','PF01','PM02','PM03','PW01','RA01','RM02','RM04','SJ01','TA14','TA15','TS01']
+site=['AG01']
 siteprocess=[]
+depthinfor=[]
 minnumperday=18
 numperday=24
-intend_to='temp'
+intend_to='temp'##############notice intend_to can be 'temp'or'salinity'
 surf_or_bott='bott'
 for k in range(len(site)):
 #################read-in obs data##################################
@@ -118,7 +121,8 @@ for k in range(len(site)):
             dept=[bd[0]-0.25*bd[0],bd[0]+.25*bd[0]]
         else:
             dept=[0,5]
-        (obs_dt,obs_temp,obs_salt)=getobs_tempsalt(site[k], input_time=[dt.datetime(1880,1,1),dt.datetime(2010,12,31)], dep=dept)
+        (obs_dt,obs_temp,obs_salt,distinct_dep)=getobs_tempsalt(site[k], input_time=[dt.datetime(1880,1,1),dt.datetime(2010,12,31)], dep=dept)
+        depthinfor.append(site[k]+','+str(bd[0])+','+str(distinct_dep[0])+'\n')
         obs_dtindex=[]
         if intend_to=='temp':            
             for kk in range(len(obs_temp)):
@@ -145,7 +149,10 @@ for k in range(len(site)):
         starttime=obs_dt[0].replace(tzinfo=None)
         endtime=obs_dt[-1].replace(tzinfo=None)
         try:
-            modtso=getFVCOM_bottom_tempsalt_netcdf(lati,loni,starttime,endtime,layer=44,vname='temp')##############notice there vname'temp'or'salinity'
+            if surf_or_bott=='bott':
+                     modtso=getFVCOM_bottom_tempsalt_netcdf(lati,loni,starttime,endtime,layer=44,vname=intend_to)
+            else:
+                     modtso=getFVCOM_bottom_tempsalt_netcdf(lati,loni,starttime,endtime,layer=0,vname=intend_to)  
             print 'now filter data to make daily obs and mod coincide.'
  
               
@@ -172,6 +179,8 @@ for k in range(len(site)):
             remoddcf.to_csv(site[k]+surf_or_bott+intend_to+'_dc_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
             remodmcf.to_csv(site[k]+surf_or_bott+intend_to+'_mc_mod.csv',index=False,header=False,na_rep='NaN',float_format='%10.2f')
             print 'now prepare plot'
+          
+            
 ##############plot da compare figure##################
             fig=plt.figure(figsize=(16,10))
             ax=fig.add_subplot(211)
@@ -198,33 +207,35 @@ for k in range(len(site)):
                 plt.ylabel('salinity')
             plt.title('eMOLT site '+site[k]+surf_or_bott+intend_to+' vs FVCOM ')
             plt.legend(['observed','modeled'],loc='best')
+            
             plt.show()
             plt.savefig(site[k]+surf_or_bott+intend_to+'_mod_obs.png')
 ############calculate the different#######################
-            output_fmt=[0,'mean','median','min','max','std']
+            #output_fmt=[0,'mean','median','min','max','std']
             diffmc=reobsmcf-remodmcf
-            month=pd.DataFrame(range(1,13),index=diffmc.index)
-            diffmc=diffmc.join(month)
-            diffmcf=diffmc.reindex(columns=output_fmt)
-            diffmcf.columns=['month','mean','median','min','max','std']
-            diffmcf.to_csv(site[k]+surf_or_bott+intend_to+'_mc_mod_mc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
+            diffmc['month']=range(1,13)
+            #month=pd.DataFrame(range(1,13),index=diffmc.index)
+            #diffmcf=diffmc.reindex(columns=output_fmt)
+            diffmc.columns=['month','mean','median','min','max','std']
+            diffmc.to_csv(site[k]+surf_or_bott+intend_to+'_mc_mod_mc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
 
             diffma=reobsmaf-remodmaf
             date=[]
             for i in range(len(diffma)):
                 date.append(str(diffma.index[i].year)+'-'+str(diffma.index[i].month))
-            datetimepd=pd.DataFrame(date,index=diffma.index)
-            diffma=diffma.join(datetimepd)
-            diffmaf=diffma.reindex(columns=output_fmt)
-            diffmaf.columns=['Year-Month','mean','median','min','max','std']
-            diffmaf.to_csv(site[k]+surf_or_bott+intend_to+'_ma_mod_ma_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
+            diffma['Year-Month']=date
+            #datetimepd=pd.DataFrame(date,index=diffma.index)
+            #diffma=diffma.join(datetimepd)
+            #diffmaf=diffma.reindex(columns=output_fmt)
+            diffma.columns=['Year-Month','mean','median','min','max','std']
+            diffma.to_csv(site[k]+surf_or_bott+intend_to+'_ma_mod_ma_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
 
             diffda=reobsdaf-remoddaf
             diffdc=reobsdcf-remoddcf
 
-            diffdaf=diffdadc(diffda,output_fmt)
+            diffdaf=diffdadc(diffda)
             diffdaf.to_csv(site[k]+surf_or_bott+intend_to+'_da_mod_da_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
-            diffdcf=diffdadc(diffdc,output_fmt)
+            diffdcf=diffdadc(diffdc)
             diffdcf.to_csv(site[k]+surf_or_bott+intend_to+'_dc_mod_dc_obs.csv',index=False,header=True,na_rep='NaN',float_format='%10.2f')
             siteprocess.append(site[k])
         except:
@@ -235,4 +246,7 @@ import pickle
 f = open('ProcessedSite.csv', 'w')
 pickle.dump(siteprocess, f)
 f.close()
+d=open('Depthinformation.csv','w')
+pickle.dump(depthinfor,d)
+d.close()
         

@@ -4,13 +4,13 @@ Modvsobs
 
 --'modvsobs.py' is the main program employed to get model and observed data and compared them then plot figure and generate output files.
 
---'daplot.py' is the program plots the daily average of model and observed data
+--'plt_dailydata.py' is the program plots the daily average of model and observed data
 
---'mcplot.py' is the program plots the Jan-Dec monthly average of model and observed data
+--'plt_monthlydata.py' is the program plots the Jan-Dec monthly average of model and observed data
 
---'totalplot.py' is the program plots the difference between model and observed data at specified sites
+--'creat_diffplot.py' is the program plots the difference between model and observed data at specified sites
 
---'totalcaculate.py' is the program generate a table to show the difference between model and observed data at specified sites.
+--'creat_table.py' is the program generate a table to show the difference between model and observed data at specified sites.
 
 --'getsite.py' is the program employed to get the specified sites information.'site.csv' is its input file and 'ProcessedSite.csv'is output file  
 
