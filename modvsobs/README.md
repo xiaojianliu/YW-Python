@@ -17,3 +17,7 @@ Modvsobs
 --'sitemap.py' is the program plots a map show the sites which we processed their data.'ProcessedSite.csv' is its input file.'EmoltSite.png' is its output file.
 
 -- 'warmcold.py' is the program plot a map show the difference at sites which we processed.red represents obs-mod>=0, blue represents obs-mod<0, the bigger point is, the bigger difference is. 
+
+--'timecaculate.py'is the program employed to get the sites which have enough years data and different years data have enough common month data.
+
+--'scatterplot.py'can plot scotter figure which show the regression equation and different coefficients.
