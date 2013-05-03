@@ -423,7 +423,7 @@ for kt in range(NT):
 #    lond=(xd-xv)/(111111.*np.cos(latv*np.pi/180.))+lonv
 #    latd=(yd-yv)/111111.+latv
     latd=(yd-yv)/111111.+latv
-#    lond=(xd-xv)/(111111.*np.cos((yd-yv)/111111.*np.pi/180.))+lonv
+    lond=(xd-xv)/(111111.*np.cos((yd-yv)/111111.*np.pi/180.))+lonv
     lond=(xd-xv)/(111111.*np.cos(latv*np.pi/180.))+lonv
     lont[kt]=lond
     latt[kt]=latd
