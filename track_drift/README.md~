@@ -9,3 +9,5 @@ There are three main programs as below:
 --"mapdrift.py"according the npy arrange data from "trackdrift.py" to plot a track map.
 
 --"comparedrift.py" plot a map show the difference between model and observe drift data.
+
+--"mapdrifttrack.py" can plot the drift track roughly according to the point you click on map
