@@ -23,7 +23,7 @@ surfacesite=['AG01','BA01','BA02','BA03']
 salinitysite=['NL01','JT04','DJ02','RS01','TA15','SK01']
 NERACOOS=['A01','B01','D02','E01','F01','I01','M01','N01']
 df=pd.read_csv('ProcessedSite.csv',sep=',',skiprows=1,index_col=0,names=['site','lat','lon'])
-for i in range(len(df)-8):
+for i in range(len(df)-3):
     (a,b)=divmod(float(df['lat'][i]),100)   
     aa=int(a)
     bb=float(b)
