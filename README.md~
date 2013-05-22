@@ -7,5 +7,3 @@ Ocean Python
 --'other' folder includes some important programs not involved in some project.
 
 --'track_drift' folder incluses some programs emloyed process surface drift data.(real drift data/simulate drift data/compare both kinds data)
-
---'visualizationtool' folder includes some programs which employed show us the ocean data and models
