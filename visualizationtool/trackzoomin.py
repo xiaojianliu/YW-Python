@@ -20,18 +20,13 @@ def nearlonlat(lon,lat,lonp,latp):
     return i#,min_dist 
     
 
-urlname=open("tandsctrl.csv", "r").readlines()[0][27:-1]
-depth=int(open("tandsctrl.csv", "r").readlines()[1][22:-1])
-TIME=open("tandsctrl.csv", "r").readlines()[2][31:-1]
-numday=int(open("tandsctrl.csv", "r").readlines()[3][24:-1])
+urlname=open("ctrl_trackzoomin.csv", "r").readlines()[0][27:-1]
+depth=int(open("ctrl_trackzoomin.csv", "r").readlines()[1][22:-1])
+TIME=open("ctrl_trackzoomin.csv", "r").readlines()[2][31:-1]
+numdays=int(open("ctrl_trackzoomin.csv", "r").readlines()[3][24:-1])
 
 
-if urlname=="30yr":
-    TIME=TIME
-    numdays=numday
-    depth=-1
-
-else:
+if urlname=="massbay":
     TIME=datetime.strptime(TIME, "%Y-%m-%d %H:%M:%S") 
     now=datetime.now()
     if TIME>now:
@@ -41,8 +36,8 @@ else:
     if diff>3:
         print "please check your input start time,within 3 days both side form now on"
         sys.exit(0)
-    numday=timedelta(days=numday)
-    if TIME+numday>now+timedelta(days=3):
+    numdays=timedelta(days=numdays)
+    if TIME+numdays>now+timedelta(days=3):
         print "please check your numday.access period is between [now-3days,now+3days]"
         sys.exit(0)
 
@@ -65,9 +60,9 @@ if urlname=='30yr':
      endrecord=startrecord+24*numdays
      url='http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3?'+'lon,lat,latc,lonc,siglay,h,Times['+str(startrecord)+':1:'+str(startrecord)+']'
 else:
-     timeperiod=(TIME+numday)-(now-timedelta(days=3))
+     timeperiod=(TIME+numdays)-(now-timedelta(days=3))
      startrecord=(timeperiod.seconds)/60/60
-     endrecord=startrecord+24*(numday.days)
+     endrecord=startrecord+24*(numdays.days)
      url="http://www.smast.umassd.edu:8080/thredds/dodsC/FVCOM/NECOFS/Forecasts/NECOFS_FVCOM_OCEAN_MASSBAY_FORECAST.nc?"+'lon,lat,latc,lonc,siglay,h,Times['+str(startrecord)+':1:'+str(startrecord)+']'
 dataset = open_url(url)
 latc = np.array(dataset['latc'])
