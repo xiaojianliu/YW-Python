@@ -13,6 +13,7 @@ import datetime as dt
 import netCDF4
 import sys
 import numpy as np
+from datetime import timedelta
 
 urlname=open("ctrl_temsalmod.csv", "r").readlines()[0][27:-1]
 depth=int(open("ctrl_temsalmod.csv", "r").readlines()[1][22:-1])
@@ -27,8 +28,8 @@ if urlname=="30yr":
     startrecord=26340+35112*(timesnum/4)+8772*(timesnum%4)+1+timedeltaprocess*24     
     url = 'http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3?temp,lon,lat,lonc,latc,time,nv,h,siglay,salinity'
 else:
-    TIME=datetime.strptime(TIME, "%Y-%m-%d %H:%M:%S") 
-    now=datetime.now()
+    TIME=dt.datetime.strptime(TIME, "%Y-%m-%d %H:%M:%S") 
+    now=dt.datetime.now()
     if TIME>now:
          diff=(TIME-now).days
     else:
@@ -36,11 +37,7 @@ else:
     if diff>3:
         print "please check your input start time,within 3 days both side form now on"
         sys.exit(0)
-    numday=timedelta(days=numday)
-    if TIME+numday>now+timedelta(days=3):
-        print "please check your numday.access period is between [now-3days,now+3days]"
-        sys.exit(0)
-    timeperiod=(TIME+numday)-(now-timedelta(days=3))
+    timeperiod=(TIME)-(now-timedelta(days=3))
     startrecord=(timeperiod.seconds)/60/60
     url="http://www.smast.umassd.edu:8080/thredds/dodsC/FVCOM/NECOFS/Forecasts/NECOFS_FVCOM_OCEAN_MASSBAY_FORECAST.nc?temp,lon,lat,lonc,latc,time,nv,h,siglay,salinity"
     
@@ -84,7 +81,6 @@ m.fillcontinents(color='grey')
 m.drawmapboundary()
 tricontourf(tri,temprature)
 colorbar()
-#m.plot(lon,lat,'r.',lonc,latc,'b+')
 plt.title(urlname+' temp model') 
 ax1=fig.add_subplot(212)
 m = Basemap(projection='cyl',llcrnrlat=min(latsize)-0.01,urcrnrlat=max(latsize)+0.01,\
@@ -96,7 +92,6 @@ m.fillcontinents(color='grey')
 m.drawmapboundary()
 tricontourf(tri,salinity)
 colorbar()
-#m.plot(lon,lat,'r.',lonc,latc,'b+')
 plt.title(urlname+' salinity model') 
 '''
 fig=figure(figsize=(8,8))
