@@ -126,9 +126,20 @@ def onclick(event):
                kf=nearlonlat(lonc,latc,lo,la) # nearest triangle center F - face
                kv=nearlonlat(lon,lat,lo,la)# nearest triangle vertex V - vertex 
                depthtotal=siglay[:,kv]*h[kv]
-               layer=np.argmin(abs(depthtotal-depth))  
+               layer=np.argmin(abs(depthtotal-depth))
+        plt.figure(figsize=(7,6))
+        latsize=[min(latd)-0.6,max(latd)+0.6]
+        lonsize=[min(lond)-0.6,max(lond)+0.6]
+        m = Basemap(projection='cyl',llcrnrlat=min(latsize)-0.01,urcrnrlat=max(latsize)+0.01,\
+            llcrnrlon=min(lonsize)-0.01,urcrnrlon=max(lonsize)+0.01,resolution='h')#,fix_aspect=False)
+        m.drawparallels(np.arange(int(min(latsize)),int(max(latsize))+1,1),labels=[1,0,0,0])
+        m.drawmeridians(np.arange(int(min(lonsize)),int(max(lonsize))+1,1),labels=[0,0,0,1])
+        m.drawcoastlines()
+        m.fillcontinents(color='grey')
+        m.drawmapboundary()
+        m.plot(lon,lat,'r.',lonc,latc,'b+')
         m.plot(lond,latd,linewidth=1.5,color='r')
-        plt.title(urlname+' model map track') 
+        plt.title(urlname+' model map track Depth:'+str(depth)+' Time:'+TIME) 
         plt.savefig(urlname+'driftrack.png')
     return True
 cid= fig.canvas.mpl_connect('button_press_event', onclick)

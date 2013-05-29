@@ -68,9 +68,9 @@ for i in range(len(lon)):
 temprature=np.array(temprature)
 salinity=np.array(salinity)
 
-latsize=[34,48]
-lonsize=[-80,-55]
-fig=figure(figsize=(8,8))
+latsize=[min(lat)-1,max(lat)+1]
+lonsize=[min(lon)-1,max(lon)+1]
+fig=figure(figsize=(6,8))
 ax=fig.add_subplot(211)
 m = Basemap(projection='cyl',llcrnrlat=min(latsize)-0.01,urcrnrlat=max(latsize)+0.01,\
             llcrnrlon=min(lonsize)-0.01,urcrnrlon=max(lonsize)+0.01,resolution='h')#,fix_aspect=False)
@@ -81,7 +81,7 @@ m.fillcontinents(color='grey')
 m.drawmapboundary()
 tricontourf(tri,temprature)
 colorbar()
-plt.title(urlname+' temp model') 
+plt.title(urlname+' salinity model Depth:'+str(depth)+' Time:'+str(TIME)[0:-9]) 
 ax1=fig.add_subplot(212)
 m = Basemap(projection='cyl',llcrnrlat=min(latsize)-0.01,urcrnrlat=max(latsize)+0.01,\
             llcrnrlon=min(lonsize)-0.01,urcrnrlon=max(lonsize)+0.01,resolution='h')#,fix_aspect=False)
@@ -92,17 +92,6 @@ m.fillcontinents(color='grey')
 m.drawmapboundary()
 tricontourf(tri,salinity)
 colorbar()
-plt.title(urlname+' salinity model') 
-'''
-fig=figure(figsize=(8,8))
-ax=fig.add_subplot(211,aspect=1.0/cos(latc.mean() * pi / 180.0))
-tricontourf(tri,temprature)
-colorbar()
-plt.title(urlname+' temp model') 
-ax1=fig.add_subplot(212,aspect=1.0/cos(latc.mean() * pi / 180.0))
-tricontourf(tri,salinity)
-colorbar()
-plt.title(urlname+' salinity model') 
-'''
+plt.title(urlname+' salinity model Depth:'+str(depth)+' Time:'+str(TIME)[0:-9]) 
 plt.show()
 plt.savefig(urlname+'temp_salini.png')
