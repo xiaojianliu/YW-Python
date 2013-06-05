@@ -17,4 +17,9 @@ There are three main programs as below:
 --"comparedrift.py" plot a map show the difference between model and observe drift data.
 
 --"mapdrifttrack.py" can plot the drift track roughly according to the point you click on map
+ 
+--"getcirclepoint.py" can get the point on concentric. 
 
+--"circletrack.py" can get the concentric points tracks,source is website data.
+
+--'diskcircletrack.py' can get the concentric points tracks,source is disk data 
