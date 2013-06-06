@@ -13,7 +13,27 @@ from mpl_toolkits.basemap import Basemap
 import os
 import math
 from conversions import dd2dm
+def dist(lat1,lon1,lat2,lon2):
+    radius = 6371 # km
+    
 
+    dlat = math.radians(lat2-lat1)
+    dlon = math.radians(lon2-lon1)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+    
+    def calcBearing(lat1, lon1, lat2, lon2):
+       dLon = lon2 - lon1
+       y = math.sin(dLon) * math.cos(lat2)
+       x = math.cos(lat1) * math.sin(lat2) \
+           - math.sin(lat1) * math.cos(lat2) * math.cos(dLon)
+       return math.atan2(y, x)
+       
+    bear= math.degrees(calcBearing(lat1, lon1, lat2, lon2))  
+    return d,bear
+'''
 def dist(lat1, lon1, lat2, lon2):
     if 1000 > lon1 > 0:
         (lat1,lon1) = dd2dm(lat1,lon1)
@@ -50,7 +70,7 @@ def dist(lat1, lon1, lat2, lon2):
     ci = math.cos(alat)*math.cos(blat)*math.cos(alon-blon)+math.sin(alat)*math.sin(blat)
     distkm = 6371*math.tan(math.sqrt(abs(1-ci*ci)/ci))
     return distkm, bear
-
+'''
 def RungeKutta4_lonlat(lon,lat,Grid,u,v,tau): 
          lon1=lon*1.;          lat1=lat*1.;        urc1,v1=VelInterp_lonlat(lon1,lat1,Grid,u,v);  
          lon2=lon+0.5*tau*urc1;lat2=lat+0.5*tau*v1;urc2,v2=VelInterp_lonlat(lon2,lat2,Grid,u,v);
