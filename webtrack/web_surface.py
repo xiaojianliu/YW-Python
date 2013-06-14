@@ -88,7 +88,7 @@ def rddate(TIME,numdays):
     timesnum=stime.year-1981
     standardtime=datetime.strptime(str(stime.year)+'-01-01 00:00:00', "%Y-%m-%d %H:%M:%S")
     timedeltaprocess=(stime-standardtime).days
-    startrecord=26340+35112*(timesnum/4)+8772*(timesnum%4)+24+timedeltaprocess*24
+    startrecord=26340+35112*(timesnum/4)+8772*(timesnum%4)+1+timedeltaprocess*24
     endrecord=startrecord+24*numdays
     return startrecord,endrecord
 def get_uv_web(time,layer):
@@ -97,12 +97,14 @@ def get_uv_web(time,layer):
         url='http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3?'+'Times'+timeurl+',u'+timeurl+uvposition+','+'v'+timeurl+uvposition
         dataset = open_url(url)
         utotal=np.array(dataset['u'])
-        vtotal=np.array(dataset['v']) 
+        vtotal=np.array(dataset['v'])
+        times=np.array(dataset['Times'])
         u=utotal[0,0,:]
         v=vtotal[0,0,:]
+        print times
         return u,v
-TIME='2002-01-01 00:00:00' 
-numdays=10 
+TIME='2003-01-08 00:00:00' 
+numdays=4 
 lond=-67.
 latd=42.
 depth=-1
