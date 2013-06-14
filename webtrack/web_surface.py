@@ -91,6 +91,16 @@ def rddate(TIME,numdays):
     startrecord=26340+35112*(timesnum/4)+8772*(timesnum%4)+24+timedeltaprocess*24
     endrecord=startrecord+24*numdays
     return startrecord,endrecord
+def get_uv_web(time,layer):
+        timeurl='['+str(time)+':1:'+str(time)+']'
+        uvposition=str([layer])+'[0:1:90414]'
+        url='http://www.smast.umassd.edu:8080/thredds/dodsC/fvcom/hindcasts/30yr_gom3?'+'Times'+timeurl+',u'+timeurl+uvposition+','+'v'+timeurl+uvposition
+        dataset = open_url(url)
+        utotal=np.array(dataset['u'])
+        vtotal=np.array(dataset['v']) 
+        u=utotal[0,0,:]
+        v=vtotal[0,0,:]
+        return u,v
 TIME='2002-01-01 00:00:00' 
 numdays=10 
 lond=-67.
@@ -140,6 +150,8 @@ tau=dt/111111.
 lont=[]
 latt=[]
 for i in range(startrecord,endrecord):
+    u,v=get_uv_web(i,layer)
+    '''    
     timeurl='['+str(i)+':1:'+str(i)+']'
 #    uvposition=str([layer])+str([kf])
     uvposition=str([layer])+'[0:1:90414]'
@@ -149,6 +161,7 @@ for i in range(startrecord,endrecord):
     vtotal=np.array(dataset['v']) 
     u=utotal[0,0,:]
     v=vtotal[0,0,:]
+    '''
 ################get the point according the position###################
     lont.append(lond)
     latt.append(latd)
