@@ -1,6 +1,6 @@
 Webtrack
 =================
-All programs in this folder are read in data from website
+All programs in this folder read in data from website
 ----------------------------------------------------------
 
 --"web_surface.py":read in data from internet and plot on model map. Includes some accurate methods from Vitalli version.
