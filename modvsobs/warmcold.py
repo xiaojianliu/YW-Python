@@ -60,4 +60,4 @@ for i in range(len(df)):
     
 plt.title('obs minus mod emolt temperature difference site')
 plt.show()
-plt.savefig('warmcold.png')
+plt.savefig('warmcoldtest.png')
