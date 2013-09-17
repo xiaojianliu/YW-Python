@@ -1,7 +1,9 @@
 Ocean Python 
 ======
 
-Sphinx website:http://www.nefsc.noaa.gov/epd/ocean/MainPage/py/sphinx_emolt/_build/html/index.html
+Sphinx website:
+
+http://www.nefsc.noaa.gov/epd/ocean/MainPage/py/sphinx_emolt/builddir/index.html
 
 --'emolt_pd.py' is the programs employeed to process different format temperature/salinity/intensity data, allow you to collecte data and plot them.
 
