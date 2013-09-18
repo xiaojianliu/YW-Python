@@ -22,3 +22,9 @@ http://www.nefsc.noaa.gov/epd/ocean/MainPage/py/sphinx_track_local/_build/html/i
 --"getcirclepoint.py" can get concentric points which will uesd by "diskcircletrack.py".
 
 --"S1-S6.py" are Vitalii programs,can generate vector figures to compare drifter and model tracks.
+
+--"separatedistance_grid.py" can generate contour figure to show the distance between drifter and model data.
+
+--"separatedistance_grid_number.py" can generate grid figure, in each small grid there is one number inside,the number is distance of drifter-model in this grid area.
+
+--"stratposition.py" can generate map show the drifter deployment position, the bigger point is, the more drifters deploy in this area.
