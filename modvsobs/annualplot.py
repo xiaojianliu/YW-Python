@@ -44,6 +44,8 @@ minnumperday=18
 numperday=24
 intend_to='temp'##############notice intend_to can be 'temp'or'salinity'
 surf_or_bott='bott'
+starttime=dt.datetime(2003,1,1)
+endtime=dt.datetime(2010,12,31)
 for k in range(len(site)):
 #################read-in obs data##################################
         print site[k]
@@ -54,7 +56,7 @@ for k in range(len(site)):
             dept=[bd[0]-0.25*bd[0],bd[0]+.25*bd[0]]
         else:
             dept=[0,5]
-        (obs_dt,obs_temp,obs_salt,distinct_dep)=getobs_tempsalt(site[k], input_time=[dt.datetime(2003,1,1),dt.datetime(2010,12,31)], dep=dept)
+        (obs_dt,obs_temp,obs_salt,distinct_dep)=getobs_tempsalt(site[k], input_time=[starttime,endtime], dep=dept)
         depthinfor.append(site[k]+','+str(bd[0])+','+str(distinct_dep[0])+'\n')
         obs_dtindex=[]
         if intend_to=='temp':            
@@ -73,8 +75,7 @@ for k in range(len(site)):
         resamdaobsdot=resamdaobs[(resamdaobs['count']>7500) & (resamdaobs['count']<8160)]
         #starttime=obs_dt[0].replace(tzinfo=None)
         #endtime=obs_dt[-1].replace(tzinfo=None)
-        starttime=dt.datetime(2003,1,1)
-        endtime=dt.datetime(2010,12,31)
+        
         if surf_or_bott=='bott':
             layer=44
             vname=intend_to
@@ -119,7 +120,7 @@ for k in range(len(site)):
                if modtso.index[mm].month==12:
                    modtso[0][mm]=modtso[0][mm]-0.12     
                    
-            
+            '''
             resamdamod=float64(modtso[0]).resample('A',how=['count','mean'])
         
             resamdamod.ix[resamdamod['count']<8160,['mean']] = 'NaN'
@@ -147,3 +148,4 @@ for k in range(len(site)):
             ax.plot_date(modtso.index,modtso[0],fmt='-',color='red')#bottom most value equals 44
             plt.grid()
             plt.show()
+            '''
