@@ -3,7 +3,7 @@ Visualization Tool
 
 Sphinx website:
 
-http://www.nefsc.noaa.gov/epd/ocean/MainPage/py/sphinx_visualizationtool/_build/html/index.html
+http://www.nefsc.noaa.gov/epd/ocean/MainPage/py/sphinx_virualizationtool/_build/html/index.html
 
 --"trackzoomin_verticalvelocity.py" can plot different models track (have U,V,W verlocity) on a map.
 
