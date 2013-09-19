@@ -7,11 +7,8 @@ Created on Tue Jun  4 09:38:59 2013
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import numpy as np
-import pylab
 from datetime import datetime
 from pydap.client import open_url
-from datetime import timedelta
-import sys
 def nearlonlat(lon,lat,lonp,latp):
     cp=np.cos(latp*np.pi/180.)
     # approximation for small distance

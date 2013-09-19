@@ -6,15 +6,9 @@ Created on Fri Jun 14 10:09:30 2013
 """
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
 import numpy as np
-import pylab
 from datetime import datetime
 from pydap.client import open_url
-from datetime import timedelta
-import sys
-import pandas as pd
-import os
 def RungeKutta4_lonlat(lon,lat,Grid,u,v,tau):       
     lon1=lon*1.;          lat1=lat*1.;        urc1,v1=VelInterp_lonlat(lon1,lat1,Grid,u,v);  
     lon2=lon+0.5*tau*urc1;lat2=lat+0.5*tau*v1;urc2,v2=VelInterp_lonlat(lon2,lat2,Grid,u,v);
