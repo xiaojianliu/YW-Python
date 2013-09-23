@@ -85,19 +85,19 @@ def dm2dd(lat,lon):
     (a,b)=divmod(float(lat),100)   
     aa=int(a)
     bb=float(b)
-    lat_value=aa+bb/60
+    lat_value=aa+bb/60.
 
     if float(lon)<0:
         (c,d)=divmod(abs(float(lon)),100)
         cc=int(c)
         dd=float(d)
-        lon_value=cc+(dd/60)
+        lon_value=cc+(dd/60.)
         lon_value=-lon_value
     else:
         (c,d)=divmod(float(lon),100)
         cc=int(c)
         dd=float(d)
-        lon_value=cc+(dd/60)
+        lon_value=cc+(dd/60.)
     return lat_value, -lon_value
 
 def dd2dms(lat,lon):
@@ -107,19 +107,19 @@ def dd2dms(lat,lon):
     lat,lon=np.asarray(lat),np.asarray(lon)
     lat_dd=abs(lat)
     lat_d=math.floor(lat_dd)
-    lat_m=math.floor((lat_dd-lat_d)*60)
-    lat_s=((lat_dd-lat_d)*60-lat_m)*60
+    lat_m=math.floor((lat_dd-lat_d)*60.)
+    lat_s=((lat_dd-lat_d)*60-lat_m)*60.
     if lon<0:
         lon_dd=abs(lon)
         lon_d=math.floor(lon_dd)
-        lon_m=math.floor((lon_dd-lon_d)*60)
-        lon_s=((lon_dd-lon_d)*60-lon_m)*60
+        lon_m=math.floor((lon_dd-lon_d)*60.)
+        lon_s=((lon_dd-lon_d)*60-lon_m)*60.
         lon_d=-lon_d
     else:
         lon_dd=abs(lon)
         lon_d=math.floor(lon_dd)
-        lon_m=math.floor((lon_dd-lon_d)*60)
-        lon_s=((lon_dd-lon_d)*60-lon_m)*60
+        lon_m=math.floor((lon_dd-lon_d)*60.)
+        lon_s=((lon_dd-lon_d)*60.-lon_m)*60.
     return int(lat_d),int(lat_m),float(lat_s), int(lon_d),int(lon_m),float(lon_s)
 
 def dens0(s, t):
