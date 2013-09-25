@@ -19,6 +19,7 @@ import numpy as np
 import sys
 import netCDF4
 from pylab import unique
+import matplotlib.dates as dates
 def get_dataset(url):
     try:
         dataset = open_url(url)
@@ -41,7 +42,7 @@ layer=44
 intend_to='temp'##############notice intend_to can be 'temp'or'salinity'
 vname=intend_to
 surf_or_bott='bott'
-month=[1]#range(1,13)
+month=range(1,13)
 for k in range(len(site)):
     fig=plt.figure(figsize=(15,10))
     ax=fig.add_subplot(111)
@@ -119,19 +120,29 @@ for k in range(len(site)):
             rmsa=np.sqrt((sum((obstso.values-modtso.values)**2))/len(obstso))
             rmsb=np.sqrt(sum((obstso.values-beftso.values)**2)/len(obstso))
             print "rmsa"+str(rmsa),"rmsb"+str(rmsb)
-     
-        
+            
             ax.plot(obstso.index,obstso[0].values,color='red')
             ax.plot(modtso.index,modtso[0].values,color='blue')
-            ax.plot(beftso.index,beftso[0].values,color='green')           
+            ax.plot(beftso.index,beftso[0].values,color='green') 
+            ax.xaxis.set_minor_locator(dates.MonthLocator(bymonth=(1),
+                                                interval=1))
+            ax.xaxis.set_minor_formatter(dates.DateFormatter('%b'))
+            ax.xaxis.set_major_locator(dates.MonthLocator())
+            ax.xaxis.set_major_formatter(dates.DateFormatter('\n%b'))
+            print str(month_time)+"is done"
         except:
             m=m+1
+            
+  
+    
+    
+    
     ax.set_ylabel('Temperature(degC)',fontsize=20)
-    ax.set_title('Bottom temperature at '+str(site[k]),fontsize=18)
+    ax.set_title('Bottom temperature at '+str(site[k]),fontsize=20)
     ax.grid(True)
     plt.legend(['observed','after assimulation','before assimulation'],loc='upper right',# bbox_to_anchor=(1.01, 1.20),
                   ncol=10, fancybox=True, shadow=True,prop={'size':20})
-    ax.tick_params(axis='both', which='major', labelsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=20)
     plt.show()
     plt.savefig(str(site[k])+'_bottTEMPERATUREassimulation.png')
-        
+       
