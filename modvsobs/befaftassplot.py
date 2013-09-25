@@ -126,7 +126,7 @@ for k in range(len(site)):
             ax.plot(beftso.index,beftso[0].values,color='green')           
         except:
             m=m+1
-    ax.set_ylabel('Temperature',fontsize=20)
+    ax.set_ylabel('Temperature(degC)',fontsize=20)
     ax.set_title('Bottom temperature at '+str(site[k]),fontsize=18)
     ax.grid(True)
     plt.legend(['observed','after assimulation','before assimulation'],loc='upper right',# bbox_to_anchor=(1.01, 1.20),
